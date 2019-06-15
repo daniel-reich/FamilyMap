@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.LoginFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="30px">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rowCount="8"
+            android:columnCount="2"
+            android:verticalSpacing="0dp"
+            android:horizontalSpacing="0dp"
+            android:useDefaultMargins="false">
+
+            <TextView
+                android:text="Server Host:"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/editServerHost"/>
+
+            <TextView
+                android:text="Server Port:"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/editServerPort"/>
+
+            <TextView
+                android:text="Username:"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/editUserName"/>
+
+            <TextView
+                android:text="Password:"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="textPassword"
+                android:id="@+id/editPassword"/>
+
+            <TextView
+                android:text="First Name:"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/editFirstName"/>
+
+            <TextView
+                android:text="Last Name:"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/editLastName"/>
+
+            <TextView
+                android:text="Email:"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/editEmail"/>
+
+            <TextView
+                android:text="Gender:"/>
+
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <RadioButton android:id="@+id/radioMale"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Male" />
+                <RadioButton android:id="@+id/radioFemale"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Female" />
+            </RadioGroup>
+
+
+        </GridLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="10px">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="10px"
+                android:text="Login"
+                android:id="@+id/loginButton"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="10px"
+                android:text="Register"
+                android:id="@+id/registerButton"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</FrameLayout>

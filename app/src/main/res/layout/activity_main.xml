@@ -6,12 +6,6 @@
 
     tools:context=".MainActivity">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar"
-
-        />
-
     <FrameLayout
 
         android:layout_width="match_parent"
@@ -22,6 +16,6 @@
         android:paddingBottom="20px"
         android:paddingLeft="20px"
         android:paddingRight="20px"
-        android:paddingTop="150px">
+        android:paddingTop="20px">
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

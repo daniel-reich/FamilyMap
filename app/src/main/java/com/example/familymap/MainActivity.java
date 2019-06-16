@@ -1,10 +1,13 @@
 package com.example.familymap;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.Toast;
 
 import com.example.familymap.Fragments.LoginFragment;
@@ -18,10 +21,13 @@ import com.example.familymap.Tasks.GetAllPersonsAsyncTask;
 
 public class MainActivity extends AppCompatActivity implements GetAllPersonsAsyncTask.PersonDataListener, GetAllEventsAsyncTask.EventDataListener {
 
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         FragmentManager frag = getSupportFragmentManager();
         FragmentTransaction transaction = frag.beginTransaction();
@@ -42,6 +48,15 @@ public class MainActivity extends AppCompatActivity implements GetAllPersonsAsyn
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        toolbar.setTitle("Family Map");
+
+        getSupportActionBar().setIcon(R.drawable.ic_launcher_foreground);
+        return true;
     }
 
     @Override

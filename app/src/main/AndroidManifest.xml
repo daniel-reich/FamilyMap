@@ -18,7 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activities.SettingsActivity"></activity>
+        <activity android:name=".Activities.EventActivity"></activity>
+        <activity android:name=".Activities.PersonActivity" />
+        <activity android:name=".Activities.SettingsActivity" />
         <activity
             android:name=".Activities.FilterActivity"
             android:label="@string/title_activity_filter"

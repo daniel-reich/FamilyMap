@@ -1,10 +1,14 @@
 package com.example.familymap.Models;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 
 import com.example.familymap.R;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -72,6 +76,19 @@ public class DataModel {
     private boolean showFamilyTree = true;
     private boolean showSpouse = true;
     private boolean showlifeStory = true;
+    private String authToken;
+
+    public HashMap<String, ArrayList<Event>> getDisplayPersonEvent() {
+        return displayPersonEvent;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
 
     public MapColors getFamilyTreeColor() {
         return familyTreeColor;
@@ -151,21 +168,30 @@ public class DataModel {
     }
 
     public void setMasterPersonList(ArrayList<Person> persons) {
-        HashMap<String, Person> map = new HashMap<>();
-        for(Person person: persons) {
-            map.put(person.getId(), person);
+        if (persons == null) {
+            this.masterPersonList = null;
+        } else {
+            HashMap<String, Person> map = new HashMap<>();
+            for(Person person: persons) {
+                map.put(person.getId(), person);
+            }
+            this.masterPersonList = map;
+            calculateData();
         }
-        this.masterPersonList = map;
-        calculateData();
+
     }
 
     public void setMasterEventsList(ArrayList<Event> events) {
-        HashMap<String, Event> map = new HashMap<>();
-        for(Event event: events) {
-            map.put(event.getId(), event);
+        if (events ==null) {
+            this.masterEventList = null;
+        } else {
+            HashMap<String, Event> map = new HashMap<>();
+            for(Event event: events) {
+                map.put(event.getId(), event);
+            }
+            this.masterEventList = map;
+            calculateData();
         }
-        this.masterEventList = map;
-        calculateData();
     }
 
     public void calculateData() {
@@ -350,6 +376,67 @@ public class DataModel {
             case Yellow: return Color.YELLOW;
             default: return R.color.white;
         }
+    }
+
+    public void reset() {
+        instance = null;
+    }
+
+    public ArrayList<PersonEventListItem> convertEventsToListItems(ArrayList<Event> events, Context context) {
+        ArrayList<PersonEventListItem> items = new ArrayList<>();
+        for(Event event: events) {
+            Person person = masterPersonList.get(event.getPersonId());
+            String topText = event.getEventType()+": "+event.City+", "+event.getCountry()+" ("+event.getYear()+")";
+            String bottomText = person.getFirstName()+" "+person.getLastName();
+            Drawable icon = new IconDrawable(context, FontAwesomeIcons.fa_map_marker).
+                    colorRes(R.color.red).sizeDp(40);
+
+            items.add(new PersonEventListItem("event", topText, bottomText, event.getId(), icon));
+        }
+        return items;
+    }
+
+    public ArrayList<PersonEventListItem> getFamilyItems(String personId, Context context) {
+        ArrayList<PersonEventListItem> items = new ArrayList<>();
+        Person person = masterPersonList.get(personId);
+        if (person.getSpouseId() != null) {
+            Person spouse = masterPersonList.get(person.getSpouseId());
+            items.add(createFamilyMember("Spouse", spouse, context));
+        }
+        if (person.getFatherId() != null) {
+            Person father = masterPersonList.get(person.getFatherId());
+            items.add(createFamilyMember("Father", father, context));
+        }
+        if (person.getMotherId() != null) {
+            Person mother = masterPersonList.get(person.getMotherId());
+            items.add(createFamilyMember("Mother", mother, context));
+        }
+        for (Person p: masterPersonList.values()) {
+            if (compare(p.getMotherId(), person.getId()) || compare(p.getFatherId(),person.getId())) {
+                Person child = masterPersonList.get(p.getId());
+                items.add(createFamilyMember("Child", child, context));
+            }
+        }
+        return items;
+    }
+
+    private PersonEventListItem createFamilyMember(String relation, Person person, Context context) {
+        String textTop = person.FirstName+" "+person.LastName;
+        String bottomText = relation;
+        Drawable icon;
+        if (person.getGender() == Gender.f) {
+            icon = new IconDrawable(context, FontAwesomeIcons.fa_female).
+                    colorRes(R.color.female_color).sizeDp(40);
+        } else {
+            icon = new IconDrawable(context, FontAwesomeIcons.fa_male).
+                    colorRes(R.color.male_color).sizeDp(40);
+        }
+        return new PersonEventListItem("person", textTop, bottomText, person.getId(), icon);
+
+    }
+
+    private static boolean compare(String first, String second) {
+        return (first == null ? second == null : first.equals(second));
     }
 
 

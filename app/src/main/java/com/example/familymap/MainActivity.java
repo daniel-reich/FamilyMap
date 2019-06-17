@@ -39,26 +39,41 @@ public class MainActivity extends AppCompatActivity implements GetAllPersonsAsyn
         setContentView(R.layout.activity_main);
         Iconify.with(new FontAwesomeModule());
 
-        FragmentManager frag = getSupportFragmentManager();
-        FragmentTransaction transaction = frag.beginTransaction();
-        LoginFragment loginFragment = new LoginFragment();
-        transaction.add(R.id.loginFragment, loginFragment).commit();
+        if (getIntent().hasExtra("LOGGED_IN")) {
+            loggedIn = getIntent().getExtras().getBoolean("LOGGED_IN");
+        }
 
-        loginFragment.setLoginOrRegisterResponseListener(new LoginFragment.LoginOrRegisterResponseListener() {
-            @Override
-            public void onLoginOrRegisterResponseRecieved(RegisterResponse response) {
-                if (response.isSuccess()) {
-                    setMenuIconsVisible(true);
-                    DataModel.getInstance().setLoggedInPersonId(response.getData().getPersonId());
-                    GetAllEventsAsyncTask getAllEvents = new GetAllEventsAsyncTask(MainActivity.this);
-                    getAllEvents.execute(response.getData().getAuthToken());
-                    GetAllPersonsAsyncTask getAllPersonsAsyncTask = new GetAllPersonsAsyncTask(MainActivity.this);
-                    getAllPersonsAsyncTask.execute(response.getData().getAuthToken());
-                } else {
-                    Toast.makeText(getApplication(), response.getError().getMessage(), Toast.LENGTH_LONG).show();
+        if (loggedIn) {
+            FragmentManager frag = getSupportFragmentManager();
+            FragmentTransaction transaction = frag.beginTransaction();
+            MapFragment mapFragment = new MapFragment();
+            transaction.add(R.id.loginFragment, mapFragment).commit();
+            setMenuIconsVisible(true);
+        } else {
+            FragmentManager frag = getSupportFragmentManager();
+            FragmentTransaction transaction = frag.beginTransaction();
+            LoginFragment loginFragment = new LoginFragment();
+            transaction.add(R.id.loginFragment, loginFragment).commit();
+
+            loginFragment.setLoginOrRegisterResponseListener(new LoginFragment.LoginOrRegisterResponseListener() {
+                @Override
+                public void onLoginOrRegisterResponseRecieved(RegisterResponse response) {
+                    if (response.isSuccess()) {
+                        setMenuIconsVisible(true);
+                        DataModel.getInstance().setLoggedInPersonId(response.getData().getPersonId());
+                        DataModel.getInstance().setAuthToken(response.getData().getAuthToken());
+                        GetAllEventsAsyncTask getAllEvents = new GetAllEventsAsyncTask(MainActivity.this);
+                        getAllEvents.execute(DataModel.getInstance().getAuthToken());
+                        GetAllPersonsAsyncTask getAllPersonsAsyncTask = new GetAllPersonsAsyncTask(MainActivity.this);
+                        getAllPersonsAsyncTask.execute(DataModel.getInstance().getAuthToken());
+                    } else {
+                        Toast.makeText(getApplication(), response.getError().getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 }
-            }
-        });
+            });
+        }
+
+
     }
 
     @Override

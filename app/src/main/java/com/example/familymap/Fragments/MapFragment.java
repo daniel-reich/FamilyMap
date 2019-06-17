@@ -1,11 +1,13 @@
 package com.example.familymap.Fragments;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.familymap.Activities.PersonActivity;
 import com.example.familymap.Models.DataModel;
 import com.example.familymap.Models.Event;
 import com.example.familymap.Models.Gender;
@@ -41,6 +44,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private TextView name;
     private TextView eventAndYear;
     private TextView eventLocation;
+    private LinearLayout selectedEvent;
+    private String selectedEventId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,6 +54,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         name = view.findViewById(R.id.person_name);
         eventAndYear = view.findViewById(R.id.event_and_year);
         eventLocation = view.findViewById(R.id.event_location);
+        selectedEvent = view.findViewById(R.id.selected_map_event);
+
+        Bundle bundle = getArguments();
+        if (bundle != null && bundle.containsKey("EVENT_ID")) {
+            selectedEventId = bundle.getString("EVENT_ID");
+        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -65,6 +76,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
 
         linesToDelete = new ArrayList<>();
+
+        selectedEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedEventId != null) {
+                    Intent intent = new Intent(getContext(), PersonActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("PERSON_ID", DataModel.getInstance().getMasterEventList().get(selectedEventId).getPersonId());
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            }
+        });
         return view;
     }
 
@@ -74,6 +98,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         drawMapMarkers();
+        if (selectedEventId != null) {
+            Event event = DataModel.getInstance().getMasterEventList().get(selectedEventId);
+            LatLng location = new LatLng(event.getLatitude(), event.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+            onMarkerClicked();
+        }
 
     }
 
@@ -85,32 +115,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
 //
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
 
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                drawMapLines(DataModel.getInstance().calculateMapLines((String)marker.getTag()));
-                Event event = DataModel.getInstance().getMasterEventList().get((String)marker.getTag());
-                Person person = DataModel.getInstance().getMasterPersonList().get(event.getPersonId());
-                if (person.getGender() == Gender.f) {
-                    Drawable femaleIcon = new IconDrawable(getContext(), FontAwesomeIcons.fa_female).
-                            colorRes(R.color.female_color).sizeDp(40);
-                    icon.setImageDrawable(femaleIcon);
-                } else {
-                    Drawable femaleIcon = new IconDrawable(getContext(), FontAwesomeIcons.fa_male).
-                            colorRes(R.color.male_color).sizeDp(40);
-                    icon.setImageDrawable(femaleIcon);
-                }
-                name.setText(person.getFirstName()+" "+person.getLastName());
-                String eventText = event.getEventType();
-                if (event.getYear() != 0) eventText = eventText+" ("+event.getYear()+")";
-                eventAndYear.setText(eventText);
-                eventLocation.setText(event.getCity()+", "+event.getCountry());
+                selectedEventId = (String) marker.getTag();
+                onMarkerClicked();
                 return false;
             }
         });
+    }
+
+    private void onMarkerClicked() {
+        drawMapLines(DataModel.getInstance().calculateMapLines(selectedEventId));
+        Event event = DataModel.getInstance().getMasterEventList().get(selectedEventId);
+        Person person = DataModel.getInstance().getMasterPersonList().get(event.getPersonId());
+        if (person.getGender() == Gender.f) {
+            Drawable femaleIcon = new IconDrawable(getContext(), FontAwesomeIcons.fa_female).
+                    colorRes(R.color.female_color).sizeDp(40);
+            icon.setImageDrawable(femaleIcon);
+        } else {
+            Drawable femaleIcon = new IconDrawable(getContext(), FontAwesomeIcons.fa_male).
+                    colorRes(R.color.male_color).sizeDp(40);
+            icon.setImageDrawable(femaleIcon);
+        }
+        name.setText(person.getFirstName()+" "+person.getLastName());
+        String eventText = event.getEventType();
+        if (event.getYear() != 0) eventText = eventText+" ("+event.getYear()+")";
+        eventAndYear.setText(eventText);
+        eventLocation.setText(event.getCity()+", "+event.getCountry());
     }
 
     private void drawMapLines(ArrayList<PolylineOptions> lines) {

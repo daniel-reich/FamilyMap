@@ -2,7 +2,9 @@ package com.example.familymap.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -10,12 +12,23 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import com.example.familymap.MainActivity;
 import com.example.familymap.Models.DataModel;
+import com.example.familymap.Models.Event;
 import com.example.familymap.Models.MapColors;
+import com.example.familymap.Models.Person;
 import com.example.familymap.R;
+import com.example.familymap.RequestResponse.AllEventResponse;
+import com.example.familymap.RequestResponse.AllPersonResponse;
+import com.example.familymap.Tasks.GetAllEventsAsyncTask;
+import com.example.familymap.Tasks.GetAllPersonsAsyncTask;
 
-public class SettingsActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class SettingsActivity extends AppCompatActivity implements GetAllPersonsAsyncTask.PersonDataListener, GetAllEventsAsyncTask.EventDataListener{
 
     private Spinner lifeStoryColors;
     private Spinner familyTreeColors;
@@ -26,10 +39,15 @@ public class SettingsActivity extends AppCompatActivity {
     private LinearLayout logout;
     private LinearLayout resync;
 
+    ArrayList<Person> personData;
+    ArrayList<Event> eventData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+
 
         lifeStoryColors = findViewById(R.id.life_story_colors);
         familyTreeColors = findViewById(R.id.family_tree_colors);
@@ -112,6 +130,61 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DataModel.getInstance().reset();
+                Intent login = new Intent(SettingsActivity.this, MainActivity.class);
+                login.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(login);
+            }
+        });
 
+        resync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                eventData = null;
+                personData = null;
+                GetAllEventsAsyncTask getAllEvents = new GetAllEventsAsyncTask(SettingsActivity.this);
+                getAllEvents.execute(DataModel.getInstance().getAuthToken());
+                GetAllPersonsAsyncTask getAllPersonsAsyncTask = new GetAllPersonsAsyncTask(SettingsActivity.this);
+                getAllPersonsAsyncTask.execute(DataModel.getInstance().getAuthToken());
+            }
+        });
+    }
+
+    @Override
+    public void onGetPersonsResponse(AllPersonResponse response) {
+        if (response.isSuccess()) {
+            personData = response.getData();
+            syncData();
+        } else {
+            Toast.makeText(getApplication(), "Error retrieving person data: "+response.getError().getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onGetEventsResponseRecieved(AllEventResponse response) {
+        if (response.isSuccess()) {
+            eventData = response.getData();
+            syncData();
+        } else {
+            Toast.makeText(getApplication(), "Error retrieving event data: "+response.getError().getMessage(), Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+    private void syncData() {
+        if (eventData!= null && personData !=null) {
+            DataModel.getInstance().setMasterEventsList(null);
+            DataModel.getInstance().setMasterPersonList(null);
+            DataModel.getInstance().setMasterEventsList(eventData);
+            DataModel.getInstance().setMasterPersonList(personData);
+            Intent intent = new Intent(this, MainActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("LOGGED_IN", true);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
     }
 }

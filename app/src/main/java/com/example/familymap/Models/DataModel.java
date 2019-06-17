@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 
 import com.example.familymap.R;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.joanzapata.iconify.IconDrawable;
@@ -18,10 +20,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 public class DataModel {
 
+    // Singleton pattern
     private static DataModel instance;
 
     private DataModel() { }
@@ -32,9 +34,29 @@ public class DataModel {
         }
         return instance;
     }
+
+    // Fields - Settings & Data
+    private String authToken;
+    private String loggedInPersonId;
+    private int mapType = GoogleMap.MAP_TYPE_NORMAL;
     private URL baseUrl;
+    private boolean showFamilyTree = true;
+    private boolean showSpouse = true;
+    private boolean showlifeStory = true;
+    private MapColors familyTreeColor = MapColors.Blue;
+    private MapColors spouseColor = MapColors.Yellow;
+    private MapColors lifeStoryColor = MapColors.Red;
+    private Collection<String> mothersSide;
+    private Collection<String> fathersSide;
+    private HashMap<String, Person> masterPersonList;
+    private HashMap<String, Event> masterEventList;
+    private HashMap<String, ArrayList<String>> filterDictionary;
+    private HashMap<String, Boolean> currentFilterSettings;
+    private HashMap<String, Event> displayEvents;
+    private HashMap<String, ArrayList<Event>> displayPersonEvent;
+    private HashMap<String, Float> markerColors;
 
-
+    // Getters and Setters
     public URL getBaseUrl() {
         return baseUrl;
     }
@@ -43,18 +65,11 @@ public class DataModel {
         this.baseUrl = new URL(baseUrl);
     }
 
-    public ArrayList<Event> mEvents;
-    public ArrayList<Person> mPersons;
-
-    public String getLoggedInPersonId() {
-        return loggedInPersonId;
-    }
 
     public void setLoggedInPersonId(String loggedInPersonId) {
         this.loggedInPersonId = loggedInPersonId;
     }
 
-    private String loggedInPersonId;
 
     public String getName() {
         Person p = masterPersonList.get(loggedInPersonId);
@@ -62,21 +77,17 @@ public class DataModel {
 
     }
 
-    private HashMap<String, Person> masterPersonList;
-    private HashMap<String, Event> masterEventList;
-    private HashMap<String, ArrayList<String>> filterDictionary;
-    private Collection<String> mothersSide;
-    private Collection<String> fathersSide;
-    private HashMap<String, Boolean> currentFilterSettings;
-    private HashMap<String, Event> displayEvents;
-    private HashMap<String, ArrayList<Event>> displayPersonEvent;
-    private MapColors familyTreeColor = MapColors.Black;
-    private MapColors spouseColor = MapColors.Yellow;
-    private MapColors lifeStoryColor = MapColors.Red;
-    private boolean showFamilyTree = true;
-    private boolean showSpouse = true;
-    private boolean showlifeStory = true;
-    private String authToken;
+    public HashMap<String, Float> getMarkerColors() {
+        return markerColors;
+    }
+
+    public int getMapType() {
+        return mapType;
+    }
+
+    public void setMapType(int mapType) {
+        this.mapType = mapType;
+    }
 
     public HashMap<String, ArrayList<Event>> getDisplayPersonEvent() {
         return displayPersonEvent;
@@ -146,6 +157,16 @@ public class DataModel {
         return masterEventList;
     }
 
+    public HashMap<String, Boolean> getCurrentFilterSettings() {
+        return currentFilterSettings;
+    }
+
+    public HashMap<String, ArrayList<String>> getFilterDictionary() {
+        return filterDictionary;
+    }
+
+
+    // Helper Methods
     public ArrayList<Event> getDisplayEvents() {
         displayEvents = new HashMap<>(masterEventList);
         for(String filter: filterDictionary.keySet()) {
@@ -157,14 +178,6 @@ public class DataModel {
         }
         calculateDisplayPersonEvent();
         return new ArrayList<>(displayEvents.values());
-    }
-
-    public HashMap<String, Boolean> getCurrentFilterSettings() {
-        return currentFilterSettings;
-    }
-
-    public HashMap<String, ArrayList<String>> getFilterDictionary() {
-        return filterDictionary;
     }
 
     public void setMasterPersonList(ArrayList<Person> persons) {
@@ -199,8 +212,30 @@ public class DataModel {
         {
             calculateFamilySides();
             calculateFilterDictionary();
+            calculateMarkerColors();
         }
+    }
 
+    private void calculateMarkerColors() {
+        ArrayList<Float> colors = new ArrayList<>();
+        colors.add(BitmapDescriptorFactory.HUE_AZURE);
+        colors.add(BitmapDescriptorFactory.HUE_RED);
+        colors.add(BitmapDescriptorFactory.HUE_GREEN);
+        colors.add(BitmapDescriptorFactory.HUE_ORANGE);
+        colors.add(BitmapDescriptorFactory.HUE_ROSE);
+        colors.add(BitmapDescriptorFactory.HUE_CYAN);
+        colors.add(BitmapDescriptorFactory.HUE_MAGENTA);
+        colors.add(BitmapDescriptorFactory.HUE_BLUE);
+        colors.add(BitmapDescriptorFactory.HUE_YELLOW);
+        colors.add(BitmapDescriptorFactory.HUE_VIOLET);
+        markerColors = new HashMap<>();
+        int i = 0;
+        for(Event event: masterEventList.values()) {
+            if (!markerColors.containsKey(event.getEventType().toLowerCase())) {
+                markerColors.put(event.getEventType().toLowerCase(), colors.get(i));
+                i = (i+1)%colors.size();
+            }
+        }
     }
 
     private void calculateFilterDictionary() {
@@ -236,6 +271,7 @@ public class DataModel {
     private void calculateFamilySides() {
         fathersSide = new HashSet<>();
         mothersSide = new HashSet<>();
+        Person fatherObject =  masterPersonList.get(loggedInPersonId);
         String father = masterPersonList.get(loggedInPersonId).getFatherId();
         String mother = masterPersonList.get(loggedInPersonId).getMotherId();
         if (father != null)
@@ -301,7 +337,7 @@ public class DataModel {
 
         if (showSpouse) {
             String spouseId = masterPersonList.get(personId).SpouseId;
-            if (spouseId != null) {
+            if (spouseId != null && displayPersonEvent.containsKey(spouseId)) {
                 Event spouseEvent = displayPersonEvent.get(spouseId).get(0);
 
                 lines.add(new PolylineOptions().add(
@@ -378,22 +414,22 @@ public class DataModel {
         }
     }
 
-    public void reset() {
-        instance = null;
-    }
-
     public ArrayList<PersonEventListItem> convertEventsToListItems(ArrayList<Event> events, Context context) {
         ArrayList<PersonEventListItem> items = new ArrayList<>();
         for(Event event: events) {
-            Person person = masterPersonList.get(event.getPersonId());
-            String topText = event.getEventType()+": "+event.City+", "+event.getCountry()+" ("+event.getYear()+")";
-            String bottomText = person.getFirstName()+" "+person.getLastName();
-            Drawable icon = new IconDrawable(context, FontAwesomeIcons.fa_map_marker).
-                    colorRes(R.color.red).sizeDp(40);
-
-            items.add(new PersonEventListItem("event", topText, bottomText, event.getId(), icon));
+            items.add(createEventItem(event, context));
         }
         return items;
+    }
+
+    private PersonEventListItem createEventItem(Event event, Context context) {
+        Person person = masterPersonList.get(event.getPersonId());
+        String topText = event.getEventType()+": "+event.City+", "+event.getCountry()+" ("+event.getYear()+")";
+        String bottomText = person.getFirstName()+" "+person.getLastName();
+        Drawable icon = new IconDrawable(context, FontAwesomeIcons.fa_map_marker).
+                colorRes(R.color.red).sizeDp(40);
+
+        return new PersonEventListItem("event", topText, bottomText, event.getId(), icon);
     }
 
     public ArrayList<PersonEventListItem> getFamilyItems(String personId, Context context) {
@@ -401,28 +437,28 @@ public class DataModel {
         Person person = masterPersonList.get(personId);
         if (person.getSpouseId() != null) {
             Person spouse = masterPersonList.get(person.getSpouseId());
-            items.add(createFamilyMember("Spouse", spouse, context));
+            items.add(createPersonItem("Spouse", spouse, context));
         }
         if (person.getFatherId() != null) {
             Person father = masterPersonList.get(person.getFatherId());
-            items.add(createFamilyMember("Father", father, context));
+            items.add(createPersonItem("Father", father, context));
         }
         if (person.getMotherId() != null) {
             Person mother = masterPersonList.get(person.getMotherId());
-            items.add(createFamilyMember("Mother", mother, context));
+            items.add(createPersonItem("Mother", mother, context));
         }
         for (Person p: masterPersonList.values()) {
             if (compare(p.getMotherId(), person.getId()) || compare(p.getFatherId(),person.getId())) {
                 Person child = masterPersonList.get(p.getId());
-                items.add(createFamilyMember("Child", child, context));
+                items.add(createPersonItem("Child", child, context));
             }
         }
         return items;
     }
 
-    private PersonEventListItem createFamilyMember(String relation, Person person, Context context) {
+    private PersonEventListItem createPersonItem(String lowerText, Person person, Context context) {
         String textTop = person.FirstName+" "+person.LastName;
-        String bottomText = relation;
+        String bottomText = lowerText;
         Drawable icon;
         if (person.getGender() == Gender.f) {
             icon = new IconDrawable(context, FontAwesomeIcons.fa_female).
@@ -439,7 +475,29 @@ public class DataModel {
         return (first == null ? second == null : first.equals(second));
     }
 
+    public ArrayList<PersonEventListItem> search(String searchString, Context context) {
+        ArrayList<PersonEventListItem> items = new ArrayList<>();
+        for(String personId: displayPersonEvent.keySet()) {
+            Person person = masterPersonList.get(personId);
+            if (person.getFirstName().toLowerCase().contains(searchString) ||
+                person.getLastName().toLowerCase().contains(searchString)) {
+                items.add(createPersonItem("", person, context));
+            }
+        }
 
+        for(Event event: displayEvents.values()) {
+            if (event.getCity().toLowerCase().contains(searchString) ||
+                event.getCountry().toLowerCase().contains(searchString) ||
+                event.getEventType().toLowerCase().contains(searchString) ||
+                Integer.toString(event.getYear()).toLowerCase().contains(searchString)) {
 
+                items.add(createEventItem(event, context));
+            }
+        }
+        return items;
+    }
 
+    public void reset() {
+        instance = null;
+    }
 }

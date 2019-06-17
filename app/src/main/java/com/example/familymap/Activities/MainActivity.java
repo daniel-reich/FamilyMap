@@ -1,8 +1,6 @@
-package com.example.familymap;
+package com.example.familymap.Activities;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -14,11 +12,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.familymap.Activities.FilterActivity;
-import com.example.familymap.Activities.SettingsActivity;
 import com.example.familymap.Fragments.LoginFragment;
 import com.example.familymap.Fragments.MapFragment;
 import com.example.familymap.Models.DataModel;
+import com.example.familymap.R;
 import com.example.familymap.RequestResponse.AllEventResponse;
 import com.example.familymap.RequestResponse.AllPersonResponse;
 import com.example.familymap.RequestResponse.RegisterResponse;
@@ -47,8 +44,8 @@ public class MainActivity extends AppCompatActivity implements GetAllPersonsAsyn
             FragmentManager frag = getSupportFragmentManager();
             FragmentTransaction transaction = frag.beginTransaction();
             MapFragment mapFragment = new MapFragment();
-            transaction.add(R.id.loginFragment, mapFragment).commit();
-            setMenuIconsVisible(true);
+            transaction.replace(R.id.loginFragment, mapFragment).commit();
+            //setMenuIconsVisible(true);
         } else {
             FragmentManager frag = getSupportFragmentManager();
             FragmentTransaction transaction = frag.beginTransaction();
@@ -98,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements GetAllPersonsAsyn
                 colorRes(R.color.white).sizeDp(40);
 
         filterItem.setIcon(filterIcon);
-        setMenuIconsVisible(false);
+        setMenuIconsVisible(loggedIn);
         return true;
     }
 
@@ -120,6 +117,10 @@ public class MainActivity extends AppCompatActivity implements GetAllPersonsAsyn
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_search:
+                Intent searchIntent = new Intent(this, SearchActivity.class);
+                startActivity(searchIntent);
+                return true;
             case R.id.menu_filter:
                 Intent filterIntent = new Intent(this, FilterActivity.class);
                 startActivity(filterIntent);

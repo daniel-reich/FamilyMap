@@ -7,7 +7,7 @@ import com.example.familymap.Models.DataModel;
 import com.example.familymap.Models.User;
 import com.example.familymap.RequestResponse.ErrorResponse;
 import com.example.familymap.RequestResponse.RegisterResponse;
-import com.example.familymap.Server.FMSProxy;
+import com.example.familymap.Utilities.FMSProxy;
 
 import java.io.IOException;
 

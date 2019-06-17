@@ -1,4 +1,4 @@
-package com.example.familymap.Server;
+package com.example.familymap.Utilities;
 
 import com.example.familymap.Models.Event;
 import com.example.familymap.Models.Person;

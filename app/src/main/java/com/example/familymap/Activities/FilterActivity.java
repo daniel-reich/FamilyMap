@@ -1,21 +1,17 @@
 package com.example.familymap.Activities;
 
-import android.graphics.drawable.Drawable;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.familymap.Models.DataModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +20,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.familymap.R;
-import com.joanzapata.iconify.IconDrawable;
-import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
 import java.util.ArrayList;
 
@@ -43,32 +37,24 @@ public class FilterActivity extends AppCompatActivity {
                 new ArrayList<String>(DataModel.getInstance().getFilterDictionary().keySet()));
         filterList.setAdapter(adapter);
 
+        getSupportActionBar().setTitle("FamilyMap: Filter");
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-//        this.menu = menu;
-//        MenuItem settingsItem = menu.findItem(R.id.menu_settings);
-//        MenuItem searchItem = menu.findItem(R.id.menu_search);
-//        MenuItem filterItem = menu.findItem(R.id.menu_filter);
-//        Drawable gearIcon = new IconDrawable(this, FontAwesomeIcons.fa_gear).
-//                colorRes(R.color.white).sizeDp(40);
-//
-//        settingsItem.setIcon(gearIcon);
-//
-//        Drawable searchIcon = new IconDrawable(this, FontAwesomeIcons.fa_search).
-//                colorRes(R.color.white).sizeDp(40);
-//
-//        searchItem.setIcon(searchIcon);
-//
-//        Drawable filterIcon = new IconDrawable(this, FontAwesomeIcons.fa_filter).
-//                colorRes(R.color.white).sizeDp(40);
-//
-//        filterItem.setIcon(filterIcon);
-//        setMenuIconsVisible(false);
-        return super.onCreateOptionsMenu(menu);
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        startTopActivity(this, false);
+        return true;
+    }
+
+    public static void startTopActivity(Context context, boolean newInstance) {
+        Intent intent = new Intent(context, MainActivity.class);
+        if (newInstance) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
+        else {
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
+        context.startActivity(intent);
     }
 
     private class FilterViewHolder extends RecyclerView.ViewHolder {

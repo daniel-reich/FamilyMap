@@ -16,7 +16,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Show life story lines"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:padding="4dp"
+            android:textSize="20sp"/>
 
         <Spinner
             android:layout_width="wrap_content"
@@ -51,7 +53,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Show family tree lines"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:padding="4dp"
+            android:textSize="20sp"/>
 
         <Spinner
             android:layout_width="wrap_content"
@@ -86,7 +90,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Show spouse lines"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:padding="4dp"
+            android:textSize="20sp"/>
 
         <Spinner
             android:layout_width="wrap_content"
@@ -121,7 +127,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Map type"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:padding="4dp"
+            android:textSize="20sp"/>
 
         <Spinner
             android:layout_width="wrap_content"
@@ -150,7 +158,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Resync Data"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:padding="4dp"
+            android:textSize="20sp"/>
 
     </LinearLayout>
 
@@ -170,7 +180,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Logout"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:padding="4dp"
+            android:textSize="20sp"/>
 
     </LinearLayout>
 
@@ -179,9 +191,4 @@
         android:layout_height="1dp"
         android:background="@color/cardview_dark_background"
         android:layout_marginBottom="5dp"/>
-
-
-
-
-
 </LinearLayout>

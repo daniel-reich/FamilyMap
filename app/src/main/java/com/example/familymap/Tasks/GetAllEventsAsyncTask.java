@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import com.example.familymap.Models.DataModel;
 import com.example.familymap.RequestResponse.AllEventResponse;
 import com.example.familymap.RequestResponse.ErrorResponse;
-import com.example.familymap.Server.FMSProxy;
+import com.example.familymap.Utilities.FMSProxy;
 
 import java.io.IOException;
 

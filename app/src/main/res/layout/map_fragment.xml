@@ -18,14 +18,15 @@
         android:layout_height="150dp"
         android:orientation="horizontal"
         android:id="@+id/selected_map_event"
+        android:padding="20dp"
         >
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_launcher_foreground"
-            android:layout_weight="1"
-            android:id="@+id/male_female_icon"/>
+            android:id="@+id/male_female_icon"
+            android:layout_gravity="center_vertical"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -37,19 +38,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:id="@+id/person_name"/>
+                android:id="@+id/person_name"
+                android:textSize="20sp"
+                android:layout_marginTop="5dp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:id="@+id/event_and_year"/>
+                android:id="@+id/event_and_year"
+                android:textSize="20sp"
+                android:layout_marginTop="5dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:id="@+id/event_location"/>
+                android:id="@+id/event_location"
+                android:textSize="20sp"
+                android:layout_marginTop="5dp"/>
         </LinearLayout>
 
 

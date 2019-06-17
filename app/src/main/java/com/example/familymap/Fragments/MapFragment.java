@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -46,6 +47,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private TextView eventLocation;
     private LinearLayout selectedEvent;
     private String selectedEventId;
+    Drawable questionIcon;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,8 +72,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             transaction.replace(R.id.map, mapFragment).commit();
         }
 
-        icon.setImageResource(R.drawable.ic_launcher_foreground);
-        eventAndYear.setText("Choose an event");
+        questionIcon = new IconDrawable(getContext(), FontAwesomeIcons.fa_question).
+                colorRes(R.color.black).sizeDp(40);
+
+        icon.setImageDrawable(questionIcon);
+        eventAndYear.setText("Click on a marker to see event details");
 
         mapFragment.getMapAsync(this);
 
@@ -97,6 +102,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(DataModel.getInstance().getMapType());
         drawMapMarkers();
         if (selectedEventId != null) {
             Event event = DataModel.getInstance().getMasterEventList().get(selectedEventId);
@@ -110,13 +116,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void drawMapMarkers() {
         for (Event event: DataModel.getInstance().getDisplayEvents()) {
             LatLng place = new LatLng(event.getLatitude(), event.getLongitude());
-            Marker marker = mMap.addMarker(new MarkerOptions().position(place));
+            float color = DataModel.getInstance().getMarkerColors().get(event.getEventType().toLowerCase());
+            Marker marker = mMap.addMarker(new MarkerOptions().position(place).icon(BitmapDescriptorFactory.defaultMarker(color)));
             marker.setTag(event.getId());
         }
-
-//
-
-
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -162,7 +165,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         if (mMap!=null) {
             drawMapMarkers();
+            mMap.setMapType(DataModel.getInstance().getMapType());
         }
+        icon.setImageDrawable(questionIcon);
+        eventAndYear.setText("Click on a marker to see event details");
+        name.setText("");
+        eventLocation.setText("");
         super.onResume();
 
     }

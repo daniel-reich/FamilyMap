@@ -15,7 +15,6 @@ public class Person {
      * @param gender Gender enum: 'm' or 'f'
      */
     public Person(String associatedUserName, String firstName, String lastName, Gender gender) {
-        Id = UUID.randomUUID().toString();
         AssociatedUserName = associatedUserName;
         FirstName = firstName;
         LastName = lastName;
@@ -34,7 +33,7 @@ public class Person {
      * @param motherId application assigned id of person's mother
      */
     public Person(String userId, String firstName, String lastName, Gender gender, String spouseId, String fatherId, String motherId) {
-        Id = UUID.randomUUID().toString();
+        Id = userId;
         AssociatedUserName = userId;
         FirstName = firstName;
         LastName = lastName;

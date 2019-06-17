@@ -9,19 +9,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
-import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
-import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
-import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 import com.example.familymap.Models.DataModel;
 import com.example.familymap.Models.Event;
 import com.example.familymap.Models.Gender;
@@ -30,7 +26,6 @@ import com.example.familymap.Models.PersonEventListItem;
 import com.example.familymap.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PersonActivity extends AppCompatActivity {
 
@@ -47,6 +42,7 @@ public class PersonActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person);
+        getSupportActionBar().setTitle("FamilyMap: Person Details");
 
         eventExpandButton = findViewById(R.id.event_list_item_expand_arrow);
         familyExpandButton = findViewById(R.id.family_list_item_expand_arrow);
@@ -68,8 +64,15 @@ public class PersonActivity extends AppCompatActivity {
             gender.setText("Male");
         }
 
+        ArrayList<Event> personEvents =  new ArrayList<>();
+        if (DataModel.getInstance().getDisplayPersonEvent().get(personId) != null) {
+            personEvents = DataModel.getInstance().getDisplayPersonEvent().get(personId);
+        }
+
         ArrayList<PersonEventListItem> eventItems = DataModel.getInstance().convertEventsToListItems(
-                DataModel.getInstance().getDisplayPersonEvent().get(personId), this);
+                personEvents, this);
+
+
 
         ArrayList<PersonEventListItem> familyItems = DataModel.getInstance().getFamilyItems(personId, this);
 
@@ -120,6 +123,23 @@ public class PersonActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        startTopActivity(this, false);
+        return true;
+    }
+
+    public static void startTopActivity(Context context, boolean newInstance) {
+        Intent intent = new Intent(context, MainActivity.class);
+        if (newInstance) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
+        else {
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
+        context.startActivity(intent);
     }
 
     private class EventViewHolder extends RecyclerView.ViewHolder {

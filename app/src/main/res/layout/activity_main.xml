@@ -4,10 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context=".MainActivity">
+    tools:context=".Activities.MainActivity">
 
     <FrameLayout
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -18,4 +17,5 @@
         android:paddingRight="20px"
         android:paddingTop="20px">
     </FrameLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

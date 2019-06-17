@@ -132,9 +132,9 @@ public class Event {
     String AssociatedUserName;
     @SerializedName(value = "personId", alternate = {"personID", "personid", "PersonID", "PersonId"})
     String PersonId;
-    @SerializedName(value = "longitude", alternate = {"Longitude"})
-    double Latitude;
     @SerializedName(value = "latitude", alternate = {"Latitude"})
+    double Latitude;
+    @SerializedName(value = "longitude", alternate = {"Longitude"})
     double Longitude;
     @SerializedName(value = "country", alternate = {"Country"})
     String Country;

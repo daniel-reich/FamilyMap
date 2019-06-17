@@ -14,7 +14,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_launcher_foreground"
-            android:id="@+id/person_event_list_item_icon"/>
+            android:id="@+id/person_event_list_item_icon"
+            android:layout_gravity="center_vertical"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -26,14 +27,18 @@
                 android:id="@+id/person_event_list_item_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:paddingTop="8dp"
+                android:paddingLeft="8dp"
+                android:textSize="15sp"
                 android:text="top" />
 
             <TextView
                 android:id="@+id/person_event_list_item_bottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingLeft="8dp"
                 android:text="bottom" />
 
         </LinearLayout>

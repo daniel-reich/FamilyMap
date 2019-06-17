@@ -5,4 +5,15 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_filter">FilterActivity</string>
+
+
+    <string-array name="color_array">
+        <item>Blue</item>
+        <item>Red</item>
+        <item>Green</item>
+        <item>Black</item>
+        <item>White</item>
+        <item>Yellow</item>
+    </string-array>
+
 </resources>

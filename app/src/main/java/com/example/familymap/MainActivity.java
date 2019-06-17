@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.familymap.Activities.FilterActivity;
+import com.example.familymap.Activities.SettingsActivity;
 import com.example.familymap.Fragments.LoginFragment;
 import com.example.familymap.Fragments.MapFragment;
 import com.example.familymap.Models.DataModel;
@@ -105,8 +106,12 @@ public class MainActivity extends AppCompatActivity implements GetAllPersonsAsyn
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_filter:
-                Intent intent = new Intent(this, FilterActivity.class);
-                startActivity(intent);
+                Intent filterIntent = new Intent(this, FilterActivity.class);
+                startActivity(filterIntent);
+                return true;
+            case R.id.menu_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
         }
         return true;

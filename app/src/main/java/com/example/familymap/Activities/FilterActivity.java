@@ -39,11 +39,6 @@ public class FilterActivity extends AppCompatActivity {
         RecyclerView filterList = findViewById(R.id.filter_recycle_view);
         filterList.setLayoutManager(new LinearLayoutManager(this));
 
-        ArrayList<String> stuff = new ArrayList<String>();
-        stuff.add("one");
-        stuff.add("two");
-        stuff.add("seventeen");
-
         FilterAdapter adapter = new FilterAdapter(
                 new ArrayList<String>(DataModel.getInstance().getFilterDictionary().keySet()));
         filterList.setAdapter(adapter);

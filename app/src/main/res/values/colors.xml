@@ -4,5 +4,13 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="male_color">#5A73EE</color>
+    <color name="female_color">#EE5ADA</color>
     <color name="white">#00FFFFFF</color>
+    <color name="red">#EE2222</color>
+    <color name="blue">#1347E9</color>
+    <color name="purple">#8F22EE</color>
+    <color name="black">#000000</color>
+    <color name="green">#32AC0C</color>
+    <color name="orange">#FF9800</color>
+    <color name="yellow">#FFEB3B</color>
 </resources>

@@ -1,11 +1,20 @@
 package com.example.familymap.Models;
 
+import android.graphics.Color;
+
+import com.example.familymap.R;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class DataModel {
 
@@ -56,6 +65,69 @@ public class DataModel {
     private Collection<String> fathersSide;
     private HashMap<String, Boolean> currentFilterSettings;
     private HashMap<String, Event> displayEvents;
+    private HashMap<String, ArrayList<Event>> displayPersonEvent;
+    private MapColors familyTreeColor = MapColors.Black;
+    private MapColors spouseColor = MapColors.Yellow;
+    private MapColors lifeStoryColor = MapColors.Red;
+    private boolean showFamilyTree = true;
+    private boolean showSpouse = true;
+    private boolean showlifeStory = true;
+
+    public MapColors getFamilyTreeColor() {
+        return familyTreeColor;
+    }
+
+    public void setFamilyTreeColor(MapColors familyTreeColor) {
+        this.familyTreeColor = familyTreeColor;
+    }
+
+    public MapColors getSpouseColor() {
+        return spouseColor;
+    }
+
+    public void setSpouseColor(MapColors spouseColor) {
+        this.spouseColor = spouseColor;
+    }
+
+    public MapColors getLifeStoryColor() {
+        return lifeStoryColor;
+    }
+
+    public void setLifeStoryColor(MapColors lifeStoryColor) {
+        this.lifeStoryColor = lifeStoryColor;
+    }
+
+    public boolean isShowFamilyTree() {
+        return showFamilyTree;
+    }
+
+    public void setShowFamilyTree(boolean showFamilyTree) {
+        this.showFamilyTree = showFamilyTree;
+    }
+
+    public boolean isShowSpouse() {
+        return showSpouse;
+    }
+
+    public void setShowSpouse(boolean showSpouse) {
+        this.showSpouse = showSpouse;
+    }
+
+    public boolean isShowlifeStory() {
+        return showlifeStory;
+    }
+
+    public void setShowlifeStory(boolean showlifeStory) {
+        this.showlifeStory = showlifeStory;
+    }
+
+    public HashMap<String, Person> getMasterPersonList() {
+        return masterPersonList;
+    }
+
+    public HashMap<String, Event> getMasterEventList() {
+        return masterEventList;
+    }
 
     public ArrayList<Event> getDisplayEvents() {
         displayEvents = new HashMap<>(masterEventList);
@@ -66,6 +138,7 @@ public class DataModel {
                 }
             }
         }
+        calculateDisplayPersonEvent();
         return new ArrayList<>(displayEvents.values());
     }
 
@@ -124,12 +197,12 @@ public class DataModel {
         }
     }
 
-    private void addToListOrCreate(String key, String eventId, HashMap<String, ArrayList<String>> map) {
+    private <T> void addToListOrCreate(String key, T event, HashMap<String, ArrayList<T>> map) {
         if (map.containsKey(key)) {
-            map.get(key).add(eventId);
+            map.get(key).add(event);
         } else {
-            ArrayList<String> list = new ArrayList<>();
-            list.add(eventId);
+            ArrayList<T> list = new ArrayList<>();
+            list.add(event);
             map.put(key, list);
         }
     }
@@ -156,5 +229,130 @@ public class DataModel {
             addToTreeRecursive(mother, collection);
 
     }
+
+    private void calculateDisplayPersonEvent() {
+        displayPersonEvent = new HashMap<>();
+        for(Event event: displayEvents.values()) {
+            addToListOrCreate(event.getPersonId(), event, displayPersonEvent);
+        }
+
+        for (ArrayList<Event> events: displayPersonEvent.values()){
+            Collections.sort(events, new Comparator<Event>() {
+                @Override
+                public int compare(Event event, Event t1) {
+                    if (event.getEventType().toLowerCase().equals("birth")) {
+                        return -1;
+                    } else if (t1.getEventType().toLowerCase().equals("birth")) {
+                        return 1;
+                    } else if (event.getEventType().toLowerCase().equals("death")) {
+                        return 1;
+                    } else if (t1.getEventType().toLowerCase().equals("death")) {
+                        return -1;
+                    } else if (event.getYear() < t1.getYear()) {
+                        return -1;
+                    } else if (event.getYear() > t1.getYear()) {
+                        return 1;
+                    } else {
+                        return event.getEventType().toLowerCase().compareTo(t1.getEventType().toLowerCase());
+                    }
+                }
+            });
+        }
+    }
+
+    public ArrayList<PolylineOptions> calculateMapLines(String eventId) {
+        boolean spouse = true;
+        boolean tree = true;
+        boolean life = true;
+        ArrayList<PolylineOptions> lines = new ArrayList<>();
+
+        Event start = DataModel
+                .getInstance()
+                .getMasterEventList()
+                .get(eventId);
+
+        String personId = start.getPersonId();
+
+        if (showSpouse) {
+            String spouseId = masterPersonList.get(personId).SpouseId;
+            if (spouseId != null) {
+                Event spouseEvent = displayPersonEvent.get(spouseId).get(0);
+
+                lines.add(new PolylineOptions().add(
+                        new LatLng(start.getLatitude(), start.getLongitude()),
+                        new LatLng(spouseEvent.getLatitude(), spouseEvent.getLongitude())).color(getColor(spouseColor)));
+            }
+
+        }
+        if (showlifeStory) {
+            PolylineOptions options = new PolylineOptions();
+            for(Event event: displayPersonEvent.get(personId)) {
+                options.add(new LatLng(event.getLatitude(), event.getLongitude()));
+            }
+            options.color(getColor(lifeStoryColor));
+            lines.add(options);
+        }
+        if (showFamilyTree) {
+            Person person = masterPersonList.get(personId);
+            recursiveFamilyTreeLines(person, start, 25, lines);
+        }
+        return lines;
+    }
+
+    private void recursiveFamilyTreeLines(Person person, Event start, int width, ArrayList<PolylineOptions> lines) {
+        ArrayList<Event> fatherEventList = displayPersonEvent.get(person.getFatherId());
+        ArrayList<Event> motherEventList = displayPersonEvent.get(person.getMotherId());
+
+        if (fatherEventList != null && fatherEventList.size()>0) {
+            Event fatherEvent = fatherEventList.get(0);
+
+            lines.add(
+                    new PolylineOptions().add(
+                            new LatLng(start.getLatitude(), start.getLongitude()),
+                            new LatLng(fatherEvent.getLatitude(), fatherEvent.getLongitude()))
+                    .color(getColor(familyTreeColor))
+                    .width(width)
+            );
+
+            if (masterPersonList.get(person.getFatherId()) != null) {
+                Person father = masterPersonList.get(person.getFatherId());
+                recursiveFamilyTreeLines(father, fatherEvent, width-4, lines);
+            }
+        }
+
+        if (motherEventList != null && motherEventList.size()>0) {
+            Event motherEvent = motherEventList.get(0);
+
+            lines.add(
+                    new PolylineOptions().add(
+                            new LatLng(start.getLatitude(), start.getLongitude()),
+                            new LatLng(motherEvent.getLatitude(), motherEvent.getLongitude()))
+                            .color(getColor(familyTreeColor))
+                            .width(width)
+            );
+
+            if (masterPersonList.get(person.getMotherId()) != null) {
+                Person mother = masterPersonList.get(person.getMotherId());
+                recursiveFamilyTreeLines(mother, motherEvent, width-4, lines);
+            }
+        }
+
+
+    }
+
+    private int getColor(MapColors color) {
+        switch (color) {
+            case Blue: return Color.BLUE;
+            case Red: return Color.RED;
+            case Green: return Color.GREEN;
+            case Black: return Color.BLACK;
+            case White: return Color.WHITE;
+            case Yellow: return Color.YELLOW;
+            default: return R.color.white;
+        }
+    }
+
+
+
 
 }

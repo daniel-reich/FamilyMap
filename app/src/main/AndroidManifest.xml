@@ -18,10 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".Activities.SettingsActivity"></activity>
         <activity
             android:name=".Activities.FilterActivity"
             android:label="@string/title_activity_filter"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
